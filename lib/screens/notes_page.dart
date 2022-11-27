@@ -109,10 +109,88 @@ class _NotePageState extends State<NotePage> {
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final appBarHeight = height * 0.1;
+    Widget popUpTile(String title, String icon) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        child: Row(
+          children: [
+            ImageIcon(
+              AssetImage(icon),
+              color: Colors.black87,
+              size: 50,
+            ),
+            const SizedBox(
+              width: 20,
+            ),
+            Text(title),
+          ],
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         leading: const Icon(Icons.description_outlined),
         title: const Text('Simple Notes'),
+        actions: [
+          PopupMenuButton<int>(
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 1,
+                child: popUpTile(
+                    'Highlighter', 'assets/icons/simple_note_icon_03.png'),
+              ),
+              PopupMenuItem(
+                value: 1,
+                child: popUpTile(
+                    'Image capture', 'assets/icons/simple_note_icon_04.png'),
+              ),
+              PopupMenuItem(
+                value: 1,
+                child: popUpTile(
+                    'Image browse', 'assets/icons/simple_note_icon_05.png'),
+              ),
+              PopupMenuItem(
+                value: 1,
+                child: popUpTile(
+                    'Voice input', 'assets/icons/simple_note_icon_06.png'),
+              ),
+              PopupMenuItem(
+                value: 1,
+                child: popUpTile(
+                    'Notes reminder', 'assets/icons/simple_note_icon_07.png'),
+              ),
+              PopupMenuItem(
+                value: 1,
+                child: popUpTile(
+                    'Notes sharing', 'assets/icons/simple_note_icon_08.png'),
+              ),
+              PopupMenuItem(
+                value: 1,
+                child: popUpTile(
+                    'Lock/Unlock', 'assets/icons/simple_note_icon_09.png'),
+              ),
+              PopupMenuItem(
+                value: 1,
+                child: popUpTile(
+                    'Notes priority', 'assets/icons/simple_note_icon_10.png'),
+              ),
+              PopupMenuItem(
+                value: 1,
+                child:
+                    popUpTile('Reset', 'assets/icons/simple_note_icon_11.png'),
+              ),
+              PopupMenuItem(
+                value: 1,
+                child:
+                    popUpTile('Save', 'assets/icons/simple_note_icon_12.png'),
+              ),
+            ],
+            offset: const Offset(0, 40),
+            elevation: 2,
+            onSelected: (value) {},
+          ),
+        ],
         toolbarHeight: appBarHeight,
         bottom: PreferredSize(
           preferredSize: Size(double.infinity, appBarHeight * 0.6),
