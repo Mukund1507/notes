@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../widgets/custom_buttons.dart';
+
 enum SelectedStyleButtonOptions {
   textStyle,
   textSize,
@@ -72,6 +74,13 @@ class _NotePageState extends State<NotePage> {
     });
   }
 
+  setColorOfText(Color color) {
+    setState(() {
+      fontColor = color;
+      selectedStyleButtonOptions = SelectedStyleButtonOptions.none;
+    });
+  }
+
   final List<Color> colors = const [
     Colors.orange,
     Colors.purple,
@@ -93,6 +102,7 @@ class _NotePageState extends State<NotePage> {
   double fontSize = 14;
   FontWeight fontWeight = FontWeight.normal;
   FontStyle fontStyle = FontStyle.normal;
+  Color fontColor = Colors.black;
   TextDecoration textDecoration = TextDecoration.none;
 
   @override
@@ -153,16 +163,19 @@ class _NotePageState extends State<NotePage> {
                     fontSize: fontSize,
                     fontWeight: fontWeight,
                     fontStyle: fontStyle,
+                    color: fontColor,
                     decoration: textDecoration,
                   ),
                   decoration: InputDecoration(
                     hintText: 'Note',
                     hintStyle: TextStyle(
-                      color: Colors.black54,
+                      color: (fontColor == Colors.black)
+                          ? Colors.black54
+                          : fontColor,
                       fontSize: fontSize,
                       fontStyle: fontStyle,
                       decoration: textDecoration,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: fontWeight,
                     ),
                   ),
                 ),
@@ -249,138 +262,15 @@ class _NotePageState extends State<NotePage> {
               child: Row(
                 children: colors
                     .map(
-                      (current) => StyleOptionColorButton(color: current),
+                      (current) => StyleOptionColorButton(
+                        color: current,
+                        onTap: () => setColorOfText(current),
+                      ),
                     )
                     .toList(),
               ),
             ),
         ],
-      ),
-    );
-  }
-}
-
-class StyleButton extends StatelessWidget {
-  const StyleButton(
-      {super.key,
-      required this.text,
-      required this.isSelected,
-      required this.onTap});
-  final String text;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: FittedBox(
-                  child: Text(
-                    text,
-                    style: TextStyle(
-                      color: (isSelected)
-                          ? Theme.of(context).primaryColor
-                          : Colors.black54,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            (isSelected)
-                ? Divider(
-                    color: Theme.of(context).primaryColor,
-                    thickness: 4,
-                    height: 4,
-                  )
-                : const Divider(
-                    color: Colors.white,
-                    thickness: 4,
-                    height: 4,
-                  ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class StyleOptionButton extends StatelessWidget {
-  const StyleOptionButton(
-      {super.key,
-      required this.text,
-      required this.isSelected,
-      this.bold = false,
-      this.italics = false,
-      this.underline = false,
-      required this.onTap});
-  final String text;
-  final bool bold;
-  final bool italics;
-  final bool underline;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        child: Column(
-          children: [
-            Container(
-              color: Colors.grey.withOpacity(0.3),
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: FittedBox(
-                  child: Text(
-                    text,
-                    style: TextStyle(
-                      color: (isSelected)
-                          ? Theme.of(context).primaryColor
-                          : Colors.black54,
-                      fontWeight: (bold) ? FontWeight.bold : FontWeight.w600,
-                      fontStyle:
-                          (italics) ? FontStyle.italic : FontStyle.normal,
-                      decoration: (underline)
-                          ? TextDecoration.underline
-                          : TextDecoration.none,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class StyleOptionColorButton extends StatelessWidget {
-  const StyleOptionColorButton({super.key, required this.color});
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(10.0),
-        child: Center(
-          child: FittedBox(
-            child: Container(
-              color: color,
-              height: 14,
-              width: 14,
-            ),
-          ),
-        ),
       ),
     );
   }
