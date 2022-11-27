@@ -1,19 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../const.dart';
 import '../widgets/custom_buttons.dart';
-
-enum SelectedStyleButtonOptions {
-  textStyle,
-  textSize,
-  textColor,
-  none,
-}
-
-enum TextStyleOptions {
-  bold,
-  italics,
-  underline,
-}
 
 class NotePage extends StatefulWidget {
   const NotePage({super.key});
@@ -81,24 +69,6 @@ class _NotePageState extends State<NotePage> {
     });
   }
 
-  final List<Color> colors = const [
-    Colors.orange,
-    Colors.purple,
-    Colors.blueAccent,
-    Colors.greenAccent,
-    Colors.brown,
-    Colors.blueGrey,
-    Colors.red,
-    Colors.black,
-  ];
-  final List<double> sizes = const [
-    12,
-    14,
-    16,
-    18,
-    20,
-  ];
-
   double fontSize = 14;
   FontWeight fontWeight = FontWeight.normal;
   FontStyle fontStyle = FontStyle.normal;
@@ -133,59 +103,18 @@ class _NotePageState extends State<NotePage> {
         leading: const Icon(Icons.description_outlined),
         title: const Text('Simple Notes'),
         actions: [
-          PopupMenuButton<int>(
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 1,
-                child: popUpTile(
-                    'Highlighter', 'assets/icons/simple_note_icon_03.png'),
-              ),
-              PopupMenuItem(
-                value: 1,
-                child: popUpTile(
-                    'Image capture', 'assets/icons/simple_note_icon_04.png'),
-              ),
-              PopupMenuItem(
-                value: 1,
-                child: popUpTile(
-                    'Image browse', 'assets/icons/simple_note_icon_05.png'),
-              ),
-              PopupMenuItem(
-                value: 1,
-                child: popUpTile(
-                    'Voice input', 'assets/icons/simple_note_icon_06.png'),
-              ),
-              PopupMenuItem(
-                value: 1,
-                child: popUpTile(
-                    'Notes reminder', 'assets/icons/simple_note_icon_07.png'),
-              ),
-              PopupMenuItem(
-                value: 1,
-                child: popUpTile(
-                    'Notes sharing', 'assets/icons/simple_note_icon_08.png'),
-              ),
-              PopupMenuItem(
-                value: 1,
-                child: popUpTile(
-                    'Lock/Unlock', 'assets/icons/simple_note_icon_09.png'),
-              ),
-              PopupMenuItem(
-                value: 1,
-                child: popUpTile(
-                    'Notes priority', 'assets/icons/simple_note_icon_10.png'),
-              ),
-              PopupMenuItem(
-                value: 1,
-                child:
-                    popUpTile('Reset', 'assets/icons/simple_note_icon_11.png'),
-              ),
-              PopupMenuItem(
-                value: 1,
-                child:
-                    popUpTile('Save', 'assets/icons/simple_note_icon_12.png'),
-              ),
-            ],
+          PopupMenuButton(
+            itemBuilder: (context) => menuOptionsMap
+                .map(
+                  (val) => PopupMenuItem(
+                    value: val['value'],
+                    child: popUpTile(
+                      val['text'],
+                      val['icon'],
+                    ),
+                  ),
+                )
+                .toList(),
             offset: const Offset(0, 40),
             elevation: 2,
             onSelected: (value) {},
@@ -200,6 +129,8 @@ class _NotePageState extends State<NotePage> {
               maxLines: 1,
               style: const TextStyle(color: Colors.white, fontSize: 24),
               controller: _titleController,
+              cursorColor: Colors.white,
+              textInputAction: TextInputAction.next,
               decoration: const InputDecoration(
                 hintText: 'Title',
                 labelText: 'Title',
@@ -237,6 +168,8 @@ class _NotePageState extends State<NotePage> {
                 child: TextField(
                   maxLines: 100,
                   minLines: 1,
+                  keyboardType: TextInputType.text,
+                  textCapitalization: TextCapitalization.sentences,
                   style: TextStyle(
                     fontSize: fontSize,
                     fontWeight: fontWeight,
