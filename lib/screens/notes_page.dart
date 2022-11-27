@@ -1,17 +1,7 @@
 import 'package:flutter/material.dart';
 
-enum SelectedStyleButtonOptions {
-  textStyle,
-  textSize,
-  textColor,
-  none,
-}
-
-enum TextStyleOptions {
-  bold,
-  italics,
-  underline,
-}
+import '../const.dart';
+import '../widgets/custom_buttons.dart';
 
 class NotePage extends StatefulWidget {
   const NotePage({super.key});
@@ -72,37 +62,64 @@ class _NotePageState extends State<NotePage> {
     });
   }
 
-  final List<Color> colors = const [
-    Colors.orange,
-    Colors.purple,
-    Colors.blueAccent,
-    Colors.greenAccent,
-    Colors.brown,
-    Colors.blueGrey,
-    Colors.red,
-    Colors.black,
-  ];
-  final List<double> sizes = const [
-    12,
-    14,
-    16,
-    18,
-    20,
-  ];
+  setColorOfText(Color color) {
+    setState(() {
+      fontColor = color;
+      selectedStyleButtonOptions = SelectedStyleButtonOptions.none;
+    });
+  }
 
   double fontSize = 14;
   FontWeight fontWeight = FontWeight.normal;
   FontStyle fontStyle = FontStyle.normal;
+  Color fontColor = Colors.black;
   TextDecoration textDecoration = TextDecoration.none;
 
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final appBarHeight = height * 0.1;
+    Widget popUpTile(String title, String icon) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        child: Row(
+          children: [
+            ImageIcon(
+              AssetImage(icon),
+              color: Colors.black87,
+              size: 50,
+            ),
+            const SizedBox(
+              width: 20,
+            ),
+            Text(title),
+          ],
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         leading: const Icon(Icons.description_outlined),
         title: const Text('Simple Notes'),
+        actions: [
+          PopupMenuButton(
+            itemBuilder: (context) => menuOptionsMap
+                .map(
+                  (val) => PopupMenuItem(
+                    value: val['value'],
+                    child: popUpTile(
+                      val['text'],
+                      val['icon'],
+                    ),
+                  ),
+                )
+                .toList(),
+            offset: const Offset(0, 40),
+            elevation: 2,
+            onSelected: (value) {},
+          ),
+        ],
         toolbarHeight: appBarHeight,
         bottom: PreferredSize(
           preferredSize: Size(double.infinity, appBarHeight * 0.6),
@@ -112,6 +129,8 @@ class _NotePageState extends State<NotePage> {
               maxLines: 1,
               style: const TextStyle(color: Colors.white, fontSize: 24),
               controller: _titleController,
+              cursorColor: Colors.white,
+              textInputAction: TextInputAction.next,
               decoration: const InputDecoration(
                 hintText: 'Title',
                 labelText: 'Title',
@@ -149,20 +168,25 @@ class _NotePageState extends State<NotePage> {
                 child: TextField(
                   maxLines: 100,
                   minLines: 1,
+                  keyboardType: TextInputType.text,
+                  textCapitalization: TextCapitalization.sentences,
                   style: TextStyle(
                     fontSize: fontSize,
                     fontWeight: fontWeight,
                     fontStyle: fontStyle,
+                    color: fontColor,
                     decoration: textDecoration,
                   ),
                   decoration: InputDecoration(
                     hintText: 'Note',
                     hintStyle: TextStyle(
-                      color: Colors.black54,
+                      color: (fontColor == Colors.black)
+                          ? Colors.black54
+                          : fontColor,
                       fontSize: fontSize,
                       fontStyle: fontStyle,
                       decoration: textDecoration,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: fontWeight,
                     ),
                   ),
                 ),
@@ -249,138 +273,15 @@ class _NotePageState extends State<NotePage> {
               child: Row(
                 children: colors
                     .map(
-                      (current) => StyleOptionColorButton(color: current),
+                      (current) => StyleOptionColorButton(
+                        color: current,
+                        onTap: () => setColorOfText(current),
+                      ),
                     )
                     .toList(),
               ),
             ),
         ],
-      ),
-    );
-  }
-}
-
-class StyleButton extends StatelessWidget {
-  const StyleButton(
-      {super.key,
-      required this.text,
-      required this.isSelected,
-      required this.onTap});
-  final String text;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: FittedBox(
-                  child: Text(
-                    text,
-                    style: TextStyle(
-                      color: (isSelected)
-                          ? Theme.of(context).primaryColor
-                          : Colors.black54,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            (isSelected)
-                ? Divider(
-                    color: Theme.of(context).primaryColor,
-                    thickness: 4,
-                    height: 4,
-                  )
-                : const Divider(
-                    color: Colors.white,
-                    thickness: 4,
-                    height: 4,
-                  ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class StyleOptionButton extends StatelessWidget {
-  const StyleOptionButton(
-      {super.key,
-      required this.text,
-      required this.isSelected,
-      this.bold = false,
-      this.italics = false,
-      this.underline = false,
-      required this.onTap});
-  final String text;
-  final bool bold;
-  final bool italics;
-  final bool underline;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        child: Column(
-          children: [
-            Container(
-              color: Colors.grey.withOpacity(0.3),
-              padding: const EdgeInsets.all(10),
-              child: Center(
-                child: FittedBox(
-                  child: Text(
-                    text,
-                    style: TextStyle(
-                      color: (isSelected)
-                          ? Theme.of(context).primaryColor
-                          : Colors.black54,
-                      fontWeight: (bold) ? FontWeight.bold : FontWeight.w600,
-                      fontStyle:
-                          (italics) ? FontStyle.italic : FontStyle.normal,
-                      decoration: (underline)
-                          ? TextDecoration.underline
-                          : TextDecoration.none,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class StyleOptionColorButton extends StatelessWidget {
-  const StyleOptionColorButton({super.key, required this.color});
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(10.0),
-        child: Center(
-          child: FittedBox(
-            child: Container(
-              color: color,
-              height: 14,
-              width: 14,
-            ),
-          ),
-        ),
       ),
     );
   }
