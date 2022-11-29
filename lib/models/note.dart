@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 class Note {
   final String id;
   String title;
@@ -5,8 +7,17 @@ class Note {
   Note({required this.id, this.title = '', required this.body});
 }
 
-class Notes {
-  List<Note> notesList = [
-    Note(id: 'Id1', body: 'My name is Mukund Sharma.', title: 'Intro'),
-  ];
+class Notes with ChangeNotifier {
+  List<Note> notesList = [];
+
+  void saveNote(Note note) {
+    var temp = notesList.indexWhere((current) => current.id == note.id);
+    if (temp == -1) {
+      notesList.add(note);
+    } else {
+      notesList.removeAt(temp);
+      notesList.insert(temp, note);
+    }
+    notifyListeners();
+  }
 }

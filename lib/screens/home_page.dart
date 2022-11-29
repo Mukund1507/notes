@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '/models/note.dart';
 import 'notes_page.dart';
@@ -8,7 +9,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final allNotes = Notes().notesList;
+    final allNotes = Provider.of<Notes>(context, listen: true).notesList;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Notes'),
@@ -38,7 +39,11 @@ class HomePage extends StatelessWidget {
           }),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, NotePage.routeName);
+          Navigator.pushNamed(
+            context,
+            NotePage.routeName,
+            arguments: Note(id: DateTime.now().toString(), title: '', body: ''),
+          );
         },
         child: const Icon(Icons.add),
       ),

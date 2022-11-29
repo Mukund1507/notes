@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../const.dart';
 import '../models/note.dart';
@@ -79,15 +80,27 @@ class _NotePageState extends State<NotePage> {
   TextDecoration textDecoration = TextDecoration.none;
   bool firstCome = false;
 
+  void reset() {
+    _titleController.clear();
+    _bodyController.clear();
+  }
+
+  void save(String id) {
+    final notes = Provider.of<Notes>(context, listen: false);
+    notes.saveNote(
+      Note(id: id, title: _titleController.text, body: _bodyController.text),
+    );
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final appBarHeight = height * 0.1;
-
+    final Note args = ModalRoute.of(context)!.settings.arguments as Note;
     if (firstCome == false) {
-      Note? args = ModalRoute.of(context)!.settings.arguments as Note?;
-      _titleController.text = (args != null) ? args.title : '';
-      _bodyController.text = (args != null) ? args.body : '';
+      _titleController.text = args.title;
+      _bodyController.text = args.body;
       firstCome = true;
     }
     Widget popUpTile(String title, String icon) {
@@ -107,11 +120,6 @@ class _NotePageState extends State<NotePage> {
           ],
         ),
       );
-    }
-
-    void reset() {
-      _titleController.clear();
-      _bodyController.clear();
     }
 
     return Scaffold(
@@ -136,6 +144,10 @@ class _NotePageState extends State<NotePage> {
             onSelected: (value) {
               if (value == MenuOptions.reset) {
                 reset();
+              }
+              if (value == MenuOptions.save &&
+                  _bodyController.text.isNotEmpty) {
+                save(args.id);
               }
             },
           ),
@@ -189,7 +201,7 @@ class _NotePageState extends State<NotePage> {
                 child: TextField(
                   maxLines: 100,
                   minLines: 1,
-                  keyboardType: TextInputType.text,
+                  keyboardType: TextInputType.visiblePassword,
                   textCapitalization: TextCapitalization.sentences,
                   controller: _bodyController,
                   style: TextStyle(
