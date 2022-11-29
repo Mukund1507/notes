@@ -116,6 +116,7 @@ class StyleOptionColorButton extends StatelessWidget {
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.all(10.0),
+          color: Colors.grey.withOpacity(0.3),
           child: Center(
             child: FittedBox(
               child: Container(
