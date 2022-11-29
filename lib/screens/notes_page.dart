@@ -130,6 +130,7 @@ class _NotePageState extends State<NotePage> {
               style: const TextStyle(color: Colors.white, fontSize: 24),
               controller: _titleController,
               cursorColor: Colors.white,
+              autofocus: true,
               textInputAction: TextInputAction.next,
               decoration: const InputDecoration(
                 hintText: 'Title',
