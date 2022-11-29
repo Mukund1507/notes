@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:notes/screens/home_page.dart';
 
 import 'screens/notes_page.dart';
 
@@ -16,7 +17,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const NotePage(),
+      home: const HomePage(),
+      routes: {
+        NotePage.routeName: (ctx) => const NotePage(),
+      },
     );
   }
 }

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../const.dart';
+import '../models/note.dart';
 import '../widgets/custom_buttons.dart';
 
 class NotePage extends StatefulWidget {
+  static const routeName = '/notepage';
   const NotePage({super.key});
 
   @override
@@ -12,6 +14,7 @@ class NotePage extends StatefulWidget {
 
 class _NotePageState extends State<NotePage> {
   final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _bodyController = TextEditingController();
   SelectedStyleButtonOptions selectedStyleButtonOptions =
       SelectedStyleButtonOptions.none;
 
@@ -74,14 +77,22 @@ class _NotePageState extends State<NotePage> {
   FontStyle fontStyle = FontStyle.normal;
   Color fontColor = Colors.black;
   TextDecoration textDecoration = TextDecoration.none;
+  bool firstCome = false;
 
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final appBarHeight = height * 0.1;
+
+    if (firstCome == false) {
+      Note? args = ModalRoute.of(context)!.settings.arguments as Note?;
+      _titleController.text = (args != null) ? args.title : '';
+      _bodyController.text = (args != null) ? args.body : '';
+      firstCome = true;
+    }
     Widget popUpTile(String title, String icon) {
       return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        padding: const EdgeInsets.symmetric(horizontal: 7.0),
         child: Row(
           children: [
             ImageIcon(
@@ -90,12 +101,17 @@ class _NotePageState extends State<NotePage> {
               size: 50,
             ),
             const SizedBox(
-              width: 20,
+              width: 15,
             ),
             Text(title),
           ],
         ),
       );
+    }
+
+    void reset() {
+      _titleController.clear();
+      _bodyController.clear();
     }
 
     return Scaffold(
@@ -107,7 +123,7 @@ class _NotePageState extends State<NotePage> {
             itemBuilder: (context) => menuOptionsMap
                 .map(
                   (val) => PopupMenuItem(
-                    value: val['value'],
+                    value: val['value'] as MenuOptions,
                     child: popUpTile(
                       val['text'],
                       val['icon'],
@@ -117,7 +133,11 @@ class _NotePageState extends State<NotePage> {
                 .toList(),
             offset: const Offset(0, 40),
             elevation: 2,
-            onSelected: (value) {},
+            onSelected: (value) {
+              if (value == MenuOptions.reset) {
+                reset();
+              }
+            },
           ),
         ],
         toolbarHeight: appBarHeight,
@@ -171,6 +191,7 @@ class _NotePageState extends State<NotePage> {
                   minLines: 1,
                   keyboardType: TextInputType.text,
                   textCapitalization: TextCapitalization.sentences,
+                  controller: _bodyController,
                   style: TextStyle(
                     fontSize: fontSize,
                     fontWeight: fontWeight,
