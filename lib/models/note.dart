@@ -7,7 +7,13 @@ class Note {
   final String title;
   final String body;
   final File? image;
-  Note({required this.id, this.title = '', required this.body, this.image});
+  final TextStyle textStyle;
+  Note(
+      {required this.id,
+      this.title = '',
+      required this.body,
+      this.image,
+      required this.textStyle});
 }
 
 class Notes with ChangeNotifier {

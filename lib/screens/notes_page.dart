@@ -100,6 +100,13 @@ class _NotePageState extends State<NotePage> {
         title: _titleController.text,
         body: _bodyController.text,
         image: image,
+        textStyle: TextStyle(
+          color: fontColor,
+          fontStyle: fontStyle,
+          fontWeight: fontWeight,
+          fontSize: fontSize,
+          decoration: textDecoration,
+        ),
       ),
     );
     Navigator.pop(context);
@@ -117,17 +124,26 @@ class _NotePageState extends State<NotePage> {
     }
   }
 
+  void setArgs(Note args) {
+    if (firstCome == false) {
+      _titleController.text = args.title;
+      _bodyController.text = args.body;
+      image = args.image;
+      fontSize = args.textStyle.fontSize ?? 14;
+      fontWeight = args.textStyle.fontWeight ?? FontWeight.normal;
+      fontColor = args.textStyle.color ?? Colors.black;
+      textDecoration = args.textStyle.decoration ?? TextDecoration.none;
+      fontStyle = args.textStyle.fontStyle ?? FontStyle.normal;
+      firstCome = true;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final appBarHeight = height * 0.1;
     final Note args = ModalRoute.of(context)!.settings.arguments as Note;
-    if (firstCome == false) {
-      _titleController.text = args.title;
-      _bodyController.text = args.body;
-      image = args.image;
-      firstCome = true;
-    }
+    setArgs(args);
     Widget popUpTile(String title, String icon) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 7.0),
