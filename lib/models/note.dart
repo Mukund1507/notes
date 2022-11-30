@@ -1,10 +1,20 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 
 class Note {
   final String id;
-  String title;
+  final String title;
   final String body;
-  Note({required this.id, this.title = '', required this.body});
+  final File? image;
+  final TextStyle textStyle;
+  Note({
+    required this.id,
+    this.title = '',
+    required this.body,
+    this.image,
+    this.textStyle = const TextStyle(),
+  });
 }
 
 class Notes with ChangeNotifier {

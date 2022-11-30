@@ -42,7 +42,11 @@ class HomePage extends StatelessWidget {
           Navigator.pushNamed(
             context,
             NotePage.routeName,
-            arguments: Note(id: DateTime.now().toString(), title: '', body: ''),
+            arguments: Note(
+              id: DateTime.now().toString(),
+              title: '',
+              body: '',
+            ),
           );
         },
         child: const Icon(Icons.add),

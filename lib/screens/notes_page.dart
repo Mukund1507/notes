@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../const.dart';
@@ -79,18 +82,60 @@ class _NotePageState extends State<NotePage> {
   Color fontColor = Colors.black;
   TextDecoration textDecoration = TextDecoration.none;
   bool firstCome = false;
+  File? image;
 
   void reset() {
     _titleController.clear();
     _bodyController.clear();
+    setState(() {
+      image = null;
+    });
   }
 
   void save(String id) {
     final notes = Provider.of<Notes>(context, listen: false);
     notes.saveNote(
-      Note(id: id, title: _titleController.text, body: _bodyController.text),
+      Note(
+        id: id,
+        title: _titleController.text,
+        body: _bodyController.text,
+        image: image,
+        textStyle: TextStyle(
+          color: fontColor,
+          fontStyle: fontStyle,
+          fontWeight: fontWeight,
+          fontSize: fontSize,
+          decoration: textDecoration,
+        ),
+      ),
     );
     Navigator.pop(context);
+  }
+
+  void pickImageFromGalleryOrCamera(bool fromCam) async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedImage = (fromCam)
+        ? await picker.pickImage(source: ImageSource.camera)
+        : await picker.pickImage(source: ImageSource.gallery);
+    if (pickedImage != null) {
+      setState(() {
+        image = File(pickedImage.path);
+      });
+    }
+  }
+
+  void setArgs(Note args) {
+    if (firstCome == false) {
+      _titleController.text = args.title;
+      _bodyController.text = args.body;
+      image = args.image;
+      fontSize = args.textStyle.fontSize ?? 14;
+      fontWeight = args.textStyle.fontWeight ?? FontWeight.normal;
+      fontColor = args.textStyle.color ?? Colors.black;
+      textDecoration = args.textStyle.decoration ?? TextDecoration.none;
+      fontStyle = args.textStyle.fontStyle ?? FontStyle.normal;
+      firstCome = true;
+    }
   }
 
   @override
@@ -98,11 +143,7 @@ class _NotePageState extends State<NotePage> {
     final height = MediaQuery.of(context).size.height;
     final appBarHeight = height * 0.1;
     final Note args = ModalRoute.of(context)!.settings.arguments as Note;
-    if (firstCome == false) {
-      _titleController.text = args.title;
-      _bodyController.text = args.body;
-      firstCome = true;
-    }
+    setArgs(args);
     Widget popUpTile(String title, String icon) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 7.0),
@@ -149,6 +190,12 @@ class _NotePageState extends State<NotePage> {
                   _bodyController.text.isNotEmpty) {
                 save(args.id);
               }
+              if (value == MenuOptions.imageBrowse) {
+                pickImageFromGalleryOrCamera(false);
+              }
+              if (value == MenuOptions.imageCapture) {
+                pickImageFromGalleryOrCamera(true);
+              }
             },
           ),
         ],
@@ -162,7 +209,6 @@ class _NotePageState extends State<NotePage> {
               style: const TextStyle(color: Colors.white, fontSize: 24),
               controller: _titleController,
               cursorColor: Colors.white,
-              autofocus: true,
               textInputAction: TextInputAction.next,
               decoration: const InputDecoration(
                 hintText: 'Title',
@@ -198,11 +244,19 @@ class _NotePageState extends State<NotePage> {
                       : 15.0),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 15),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  image: (image != null)
+                      ? DecorationImage(
+                          image: Image.file(image!).image, fit: BoxFit.cover)
+                      : null,
+                ),
                 child: TextField(
                   maxLines: 100,
                   minLines: 1,
                   keyboardType: TextInputType.visiblePassword,
                   textCapitalization: TextCapitalization.sentences,
+                  autofocus: true,
                   controller: _bodyController,
                   style: TextStyle(
                     fontSize: fontSize,
