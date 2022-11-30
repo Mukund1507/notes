@@ -8,12 +8,13 @@ class Note {
   final String body;
   final File? image;
   final TextStyle textStyle;
-  Note(
-      {required this.id,
-      this.title = '',
-      required this.body,
-      this.image,
-      required this.textStyle});
+  Note({
+    required this.id,
+    this.title = '',
+    required this.body,
+    this.image,
+    this.textStyle = const TextStyle(),
+  });
 }
 
 class Notes with ChangeNotifier {

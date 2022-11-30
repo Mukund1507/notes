@@ -46,7 +46,6 @@ class HomePage extends StatelessWidget {
               id: DateTime.now().toString(),
               title: '',
               body: '',
-              textStyle: const TextStyle(),
             ),
           );
         },
