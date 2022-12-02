@@ -97,3 +97,9 @@ enum TextStyleOptions {
   italics,
   underline,
 }
+
+enum Priority {
+  high,
+  low,
+  neutral,
+}

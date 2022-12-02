@@ -76,11 +76,17 @@ class _NotePageState extends State<NotePage> {
     });
   }
 
+  setPriorityOfNote(Priority priority) {
+    notePriority = priority;
+    Navigator.of(context).pop();
+  }
+
   double fontSize = 14;
   FontWeight fontWeight = FontWeight.normal;
   FontStyle fontStyle = FontStyle.normal;
   Color fontColor = Colors.black;
   TextDecoration textDecoration = TextDecoration.none;
+  Priority notePriority = Priority.neutral;
   bool firstCome = false;
   File? image;
 
@@ -108,6 +114,7 @@ class _NotePageState extends State<NotePage> {
           decoration: textDecoration,
         ),
       ),
+      notePriority,
     );
     Navigator.pop(context);
   }
@@ -136,6 +143,51 @@ class _NotePageState extends State<NotePage> {
       fontStyle = args.textStyle.fontStyle ?? FontStyle.normal;
       firstCome = true;
     }
+  }
+
+  void showPriorityDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          actions: [
+            ListTile(
+              onTap: () => setPriorityOfNote(Priority.high),
+              title: Text(
+                'High',
+                style: TextStyle(
+                  color: (notePriority == Priority.high)
+                      ? Theme.of(context).primaryColor
+                      : Colors.black87,
+                ),
+              ),
+            ),
+            ListTile(
+              onTap: () => setPriorityOfNote(Priority.neutral),
+              title: Text(
+                'Neutral',
+                style: TextStyle(
+                  color: (notePriority == Priority.neutral)
+                      ? Theme.of(context).primaryColor
+                      : Colors.black87,
+                ),
+              ),
+            ),
+            ListTile(
+              onTap: () => setPriorityOfNote(Priority.low),
+              title: Text(
+                'Low',
+                style: TextStyle(
+                  color: (notePriority == Priority.low)
+                      ? Theme.of(context).primaryColor
+                      : Colors.black87,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -195,6 +247,9 @@ class _NotePageState extends State<NotePage> {
               }
               if (value == MenuOptions.imageCapture) {
                 pickImageFromGalleryOrCamera(true);
+              }
+              if (value == MenuOptions.notesPriority) {
+                showPriorityDialog();
               }
             },
           ),
