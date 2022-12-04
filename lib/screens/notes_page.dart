@@ -115,9 +115,28 @@ class _NotePageState extends State<NotePage> {
           decoration: textDecoration,
         ),
       ),
-      notePriority,
     );
     Navigator.pop(context);
+  }
+
+  void shareNote(String id) {
+    final notes = Provider.of<Notes>(context, listen: false);
+    notes.shareNote(
+      Note(
+        id: id,
+        title: _titleController.text,
+        body: _bodyController.text,
+        image: image,
+        priority: notePriority,
+        textStyle: TextStyle(
+          color: fontColor,
+          fontStyle: fontStyle,
+          fontWeight: fontWeight,
+          fontSize: fontSize,
+          decoration: textDecoration,
+        ),
+      ),
+    );
   }
 
   void pickImageFromGalleryOrCamera(bool fromCam) async {
@@ -252,6 +271,10 @@ class _NotePageState extends State<NotePage> {
               }
               if (value == MenuOptions.notesPriority) {
                 showPriorityDialog();
+              }
+              if (value == MenuOptions.notesSharing &&
+                  _bodyController.text.isNotEmpty) {
+                shareNote(args.id);
               }
             },
           ),

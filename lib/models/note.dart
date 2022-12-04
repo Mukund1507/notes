@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:notes/const.dart';
+import 'package:share_plus/share_plus.dart';
 
 class Note {
   final String id;
@@ -26,15 +27,15 @@ class Notes with ChangeNotifier {
   List<Note> lowPriorityNotesList = [];
   List<Note> neutralPriorityNotesList = [];
 
-  void saveNote(Note note, Priority priority) {
+  void saveNote(Note note) {
     var temp = notesList.indexWhere((current) => current.id == note.id);
     if (temp == -1) {
       notesList.add(note);
-      if (priority == Priority.high) {
+      if (note.priority == Priority.high) {
         highPriorityNotesList.add(note);
-      } else if (priority == Priority.neutral) {
+      } else if (note.priority == Priority.neutral) {
         neutralPriorityNotesList.add(note);
-      } else if (priority == Priority.low) {
+      } else if (note.priority == Priority.low) {
         lowPriorityNotesList.add(note);
       }
     } else {
@@ -43,14 +44,24 @@ class Notes with ChangeNotifier {
       highPriorityNotesList.removeWhere((current) => current.id == note.id);
       neutralPriorityNotesList.removeWhere((current) => current.id == note.id);
       lowPriorityNotesList.removeWhere((current) => current.id == note.id);
-      if (priority == Priority.high) {
+      if (note.priority == Priority.high) {
         highPriorityNotesList.add(note);
-      } else if (priority == Priority.neutral) {
+      } else if (note.priority == Priority.neutral) {
         neutralPriorityNotesList.add(note);
       } else if (note.priority == Priority.low) {
         lowPriorityNotesList.add(note);
       }
     }
     notifyListeners();
+  }
+
+  void shareNote(Note note) {
+    saveNote(note);
+    if (note.image != null) {
+      XFile xFile = XFile(note.image!.path);
+      Share.shareXFiles([xFile], text: note.body, subject: note.title);
+    } else {
+      Share.share(note.body, subject: note.title);
+    }
   }
 }
