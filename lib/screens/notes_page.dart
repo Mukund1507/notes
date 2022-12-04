@@ -106,6 +106,7 @@ class _NotePageState extends State<NotePage> {
         title: _titleController.text,
         body: _bodyController.text,
         image: image,
+        priority: notePriority,
         textStyle: TextStyle(
           color: fontColor,
           fontStyle: fontStyle,
@@ -141,6 +142,7 @@ class _NotePageState extends State<NotePage> {
       fontColor = args.textStyle.color ?? Colors.black;
       textDecoration = args.textStyle.decoration ?? TextDecoration.none;
       fontStyle = args.textStyle.fontStyle ?? FontStyle.normal;
+      notePriority = args.priority;
       firstCome = true;
     }
   }
