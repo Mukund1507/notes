@@ -1,8 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
-import 'package:notes/const.dart';
 import 'package:share_plus/share_plus.dart';
+
+import '/const.dart';
 
 class Note {
   final String id;
@@ -11,6 +12,7 @@ class Note {
   final File? image;
   final TextStyle textStyle;
   final Priority priority;
+  String? password;
   Note({
     required this.id,
     required this.body,
@@ -18,7 +20,19 @@ class Note {
     this.priority = Priority.neutral,
     this.image,
     this.textStyle = const TextStyle(),
+    this.password,
   });
+  lockUnlockNote(String newPassword) {
+    if (password == null) {
+      password = newPassword;
+    } else {
+      if (newPassword == password) {
+        password = null;
+        // ignore: avoid_print
+        print('Incorrect password');
+      }
+    }
+  }
 }
 
 class Notes with ChangeNotifier {
@@ -59,9 +73,10 @@ class Notes with ChangeNotifier {
     saveNote(note);
     if (note.image != null) {
       XFile xFile = XFile(note.image!.path);
-      Share.shareXFiles([xFile], text: note.body, subject: note.title);
+      Share.shareXFiles([xFile],
+          text: 'NOTE: ${note.body}', subject: note.title);
     } else {
-      Share.share(note.body, subject: note.title);
+      Share.share('NOTE: ${note.body}', subject: note.title);
     }
   }
 }

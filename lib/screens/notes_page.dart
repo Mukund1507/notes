@@ -89,6 +89,7 @@ class _NotePageState extends State<NotePage> {
   Priority notePriority = Priority.neutral;
   bool firstCome = false;
   File? image;
+  String? password;
 
   void reset() {
     _titleController.clear();
@@ -107,6 +108,7 @@ class _NotePageState extends State<NotePage> {
         body: _bodyController.text,
         image: image,
         priority: notePriority,
+        password: (password == '' || password == null) ? null : password,
         textStyle: TextStyle(
           color: fontColor,
           fontStyle: fontStyle,
@@ -162,6 +164,7 @@ class _NotePageState extends State<NotePage> {
       textDecoration = args.textStyle.decoration ?? TextDecoration.none;
       fontStyle = args.textStyle.fontStyle ?? FontStyle.normal;
       notePriority = args.priority;
+      password = args.password;
       firstCome = true;
     }
   }
@@ -208,6 +211,67 @@ class _NotePageState extends State<NotePage> {
           ],
         );
       },
+    );
+  }
+
+  void showPasswordField(BuildContext ctx, String id) {
+    final notes = Provider.of<Notes>(context, listen: false).notesList;
+    int index = notes.indexWhere((element) => element.id == id);
+    Note? note;
+    if (index != -1) {
+      note = notes[index];
+    }
+    final TextEditingController passwordController = TextEditingController();
+    showDialog(
+      context: ctx,
+      builder: ((context) => AlertDialog(
+            actions: [
+              Container(
+                alignment: Alignment.topLeft,
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  (password == null) ? 'Lock Note' : 'Unlock Note',
+                  style: TextStyle(
+                      fontSize: 20, color: Theme.of(context).primaryColor),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    hintText: 'Password',
+                    suffixIcon: Icon(Icons.remove_red_eye),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cancel'),
+                    ),
+                    const SizedBox(width: 30),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (note != null) {
+                          note.lockUnlockNote(passwordController.text);
+                        } else {
+                          password = passwordController.text;
+                        }
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Submit'),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          )),
     );
   }
 
@@ -275,6 +339,9 @@ class _NotePageState extends State<NotePage> {
               if (value == MenuOptions.notesSharing &&
                   _bodyController.text.isNotEmpty) {
                 shareNote(args.id);
+              }
+              if (value == MenuOptions.lockUnlock) {
+                showPasswordField(context, args.id);
               }
             },
           ),
