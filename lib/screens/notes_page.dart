@@ -3,6 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:speech_to_text/speech_to_text.dart';
+import 'package:draggable_fab/draggable_fab.dart';
 
 import '../const.dart';
 import '../models/note.dart';
@@ -90,12 +93,20 @@ class _NotePageState extends State<NotePage> {
   bool firstCome = false;
   File? image;
   String? password;
+  bool isHighLighterFab = false;
 
   void reset() {
     _titleController.clear();
     _bodyController.clear();
     setState(() {
       image = null;
+      fontSize = 14;
+      fontWeight = FontWeight.normal;
+      fontStyle = FontStyle.normal;
+      fontColor = Colors.black;
+      textDecoration = TextDecoration.none;
+      notePriority = Priority.neutral;
+      password = null;
     });
   }
 
@@ -275,6 +286,55 @@ class _NotePageState extends State<NotePage> {
     );
   }
 
+  final SpeechToText _speechToText = SpeechToText();
+  bool isListening = false;
+  void _initSpeech() async {
+    isListening = await _speechToText.initialize();
+    setState(() {});
+  }
+
+  void _startListening() async {
+    await _speechToText.listen(
+      onResult: _onSpeechResult,
+      listenMode: ListenMode.dictation,
+      pauseFor: const Duration(minutes: 1),
+      listenFor: const Duration(minutes: 1),
+    );
+
+    setState(() {});
+  }
+
+  void _stopListening() async {
+    await _speechToText.stop();
+    setState(() {});
+  }
+
+  void _onSpeechResult(SpeechRecognitionResult result) {
+    setState(() {
+      if (result.finalResult) {
+        if (_bodyController.text != '') {
+          _bodyController.text =
+              '${_bodyController.text} ${_speechToText.lastRecognizedWords}';
+        } else {
+          _bodyController.text = _speechToText.lastRecognizedWords;
+        }
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initSpeech();
+  }
+
+  @override
+  void dispose() {
+    _bodyController.dispose();
+    _titleController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -301,6 +361,23 @@ class _NotePageState extends State<NotePage> {
     }
 
     return Scaffold(
+      floatingActionButton: DraggableFab(
+        child: (isHighLighterFab)
+            ? FloatingActionButton(
+                onPressed: () {},
+                child: const Icon(Icons.edit),
+              )
+            : FloatingActionButton(
+                onPressed: () {
+                  _speechToText.isNotListening
+                      ? _startListening()
+                      : _stopListening();
+                },
+                child: (_speechToText.isNotListening)
+                    ? const Icon(Icons.mic_off)
+                    : const Icon(Icons.mic),
+              ),
+      ),
       appBar: AppBar(
         leading: const Icon(Icons.description_outlined),
         title: const Text('Simple Notes'),
@@ -342,6 +419,16 @@ class _NotePageState extends State<NotePage> {
               }
               if (value == MenuOptions.lockUnlock) {
                 showPasswordField(context, args.id);
+              }
+              if (value == MenuOptions.voiceInput) {
+                setState(() {
+                  isHighLighterFab = false;
+                });
+              }
+              if (value == MenuOptions.highlighter) {
+                setState(() {
+                  isHighLighterFab = true;
+                });
               }
             },
           ),
